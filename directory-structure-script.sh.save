@@ -116,8 +116,8 @@ touch documentation/common-stack/others/migrate/sop/readme.md
 mkdir -p documentation/common-stack/ansible/role/introduction/documentation
 touch documentation/common-stack/ansible/role/introduction/documentation/readme.md
 
-mkdir -p documentation/common-stack/ansible/role/directory-structure/documentation
-touch documentation/common-stack/ansible/role/directory-structure/documentation/readme.md
+mkdir -p documentation/common-stack/ansible/role/introduction/documentation
+touch documentation/common-stack/ansible/role/introduction/documentation/readme.md
 
 mkdir -p documentation/common-stack/ansible/role/ci/documentation
 touch documentation/common-stack/ansible/role/ci/documentation/readme.md
@@ -129,8 +129,8 @@ mkdir -p documentation/common-stack/ansible/role/jinja-templating/documentation
 touch documentation/common-stack/ansible/role/jinja-templating/documentation/readme.md
 
 # Ansible Playbook
-mkdir -p documentation/common-stack/ansible/playbook/introduction/documentation
-touch documentation/common-stack/ansible/playbook/introduction/documentation/readme.md
+mkdir -p documentation/common-stack/ansible/playbook/documentation
+touch documentation/common-stack/ansible/playbook/documentation/readme.md
 
 mkdir -p documentation/common-stack/ansible/playbook/ci/documentation
 touch documentation/common-stack/ansible/playbook/ci/documentation/readme.md
