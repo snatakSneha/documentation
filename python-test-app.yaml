@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: python-test-app
+  namespace: flagd-nonprod
+data:
+  main.py: |
+    import time
+    from openfeature import api
+    from openfeature.provider.flagd import FlagdProvider
+
+    # Initialize OpenFeature with Flagd provider
+    api.set_provider(FlagdProvider(host="localhost", port=8013))
+    client = api.get_client()
+
+    print("Python Feature Flag Test started...")
+    while True:
+        try:
+            # Evaluate the flag
+            show_welcome = client.get_boolean_value("show-welcome-message", False)
+            
+            if show_welcome:
+                print(">>> [FEATURE ENABLED]: Welcome to the Flagd Python Test!")
+            else:
+                print("... [FEATURE DISABLED]: Welcome message is currently off.")
+                
+        except Exception as e:
+            print(f"Error evaluating flag: {e}")
+            
+        time.sleep(5)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-test-app
+  namespace: flagd-nonprod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-test-app
+  template:
+    metadata:
+      annotations:
+        openfeature.dev/enabled: "true"
+        openfeature.dev/featureflagsource: "flagd-nonprod/python-test-source"
+      labels:
+        app: python-test-app
+    spec:
+      containers:
+        - name: python-app
+          image: python:3.11-slim
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Installing OpenFeature SDK..."
+              pip install --no-cache-dir openfeature-sdk openfeature-provider-flagd
+              echo "Starting Python App..."
+              python /app/main.py
+          volumeMounts:
+            - name: app-code
+              mountPath: /app
+      volumes:
+        - name: app-code
+          configMap:
+            name: python-test-app
