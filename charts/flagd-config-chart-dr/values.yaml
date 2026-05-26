@@ -1,0 +1,119 @@
+replicaCount: 2
+image:
+  repository: ghcr.io/open-feature/open-feature-operator
+  pullPolicy: IfNotPresent
+  tag: ""
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+rbac:
+  subjectsNamespace: "flagd-nonprod"
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+# ✅ Prometheus pod annotations for metrics scraping
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+podSecurityContext:
+  runAsNonRoot: true
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 64Mi
+nodeSelector: {}
+tolerations: []
+affinity: {}
+verbose: true
+metricsPort: 8080
+healthProbePort: 8081
+leaderElection:
+  enabled: true
+  resourceName: flagd-operator-leader-election
+flagd:
+  image:
+    repository: ghcr.io/open-feature/flagd
+    tag: "v0.15.2"
+crds:
+  enabled: true
+pdb:
+  enabled: true
+  minAvailable: 1
+  maxUnavailable: ""
+podAntiAffinity:
+  enabled: true
+  type: soft
+tls:
+  enabled: true
+ui:
+  enabled: true
+  image:
+    repository: python
+    tag: "3.11-slim"
+    pullPolicy: IfNotPresent
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
+  podAnnotations: {}
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+  ingress:
+    enabled: true
+    annotations: {}
+    hosts:
+      - host: flagd-ui.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+  auth:
+    enabled: true
+    username: ""
+    password: ""
+    secretKey: ""
+    existingSecret: ""
+  sso:
+    enabled: true
+    discoveryUrl: "https://keycloak.opstree.dev/realms/master/.well-known/openid-configuration"
+    clientId: ""
+    clientSecret: ""
+    existingSecret: ""
+  config:
+    brandName: "Flagd Central"
+    clusterDescription: "Secure access for coe-dev-cluster"
+    defaultNamespace: "flagd-nonprod"
+    vault:
+      url: "https://vault.opstree.dev/v1/secret/data/feature-flags"
+      secretName: "vault-token-secret"
+      secretKey: "token"
+# ✅ Metrics exposure for Observability Team
+metrics:
+  enabled: true
+  service:
+    port: 8080
+  ingress:
+    enabled: true
+    host: "flagd.opstree.dev"
+    path: "/metrics"
+    annotations: {}
+# ✅ ServiceMonitor for Observability Team
+serviceMonitor:
+  enabled: true
+  interval: "30s"
+  scrapeTimeout: "10s"
+  additionalLabels: {}
